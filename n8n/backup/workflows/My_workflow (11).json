@@ -1,0 +1,387 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -1260,
+        400
+      ],
+      "id": "f8826a61-1b4f-4a31-bdd0-4722d4303bda",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "EBI6dOcQJYDswgil",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        300
+      ],
+      "id": "8a09cf78-1bbc-49ff-9bcc-608178687244",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "id"
+        },
+        "embeddingBatchSize": 250,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        -1160,
+        100
+      ],
+      "id": "ba4d971a-4d25-48f9-a270-5fecb96cc2d6",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "V02bcllIG4r1Qs48",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "udhay86kumar",
+          "mode": "list",
+          "cachedResultName": "udhay86kumar",
+          "cachedResultUrl": "https://github.com/udhay86kumar"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "RAG_App",
+          "mode": "list",
+          "cachedResultName": "RAG_App",
+          "cachedResultUrl": "https://github.com/udhay86kumar/RAG_App"
+        },
+        "filePath": "Teacher_Self_Registration_C2C_Guide.pdf",
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        -1540,
+        100
+      ],
+      "id": "6c4ff424-b0b9-4619-8f5c-f5b172ab68d3",
+      "name": "GitHub",
+      "webhookId": "ac5cd62a-5a3a-464d-8515-3e2978935b11",
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "5dKcunMT1eVrvPtK",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        120
+      ],
+      "id": "6f250e6e-a50c-4a55-a3f5-0c8ad2c6c87f",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:latest",
+        "options": {
+          "numPredict": 2000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        320
+      ],
+      "id": "6fbe4e82-4b61-4f66-a49c-0ae4e1ac0457",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "EBI6dOcQJYDswgil",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        240,
+        560
+      ],
+      "id": "8bc7f812-dc17-4c72-b090-b737c7003e37",
+      "name": "Embeddings Ollama1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "EBI6dOcQJYDswgil",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query.prompt }}",
+        "options": {
+          "systemPromptTemplate": "=You are a smart, accurate, and reliable assistant. Only use the provided context retrieved from uploaded documents and the vector store to answer questions. Do not rely on prior knowledge or make assumptions. If the context does not contain a relevant answer, say:\n\"I could not find relevant information in the provided context.\"\n\n---------------------\nContext:\n{context}\n\n---------------------\nHuman:\n{{ $json.query.prompt }}\n\nInstructions:\n- Answer based only on the context from the vector store.\n- If the context includes any links or source information, include them in the response.\n- Format your answer clearly. Use bullet points, headings, or markdown where appropriate.\n- If the input is vague or partial, try to infer and guide the user helpfully using only the provided context.\n- Never fabricate or hallucinate any information outside of what's retrieved.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b301a673-e3be-48ee-99ef-c075eaefc188",
+      "name": "Question and Answer Chain",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        300,
+        220
+      ],
+      "id": "30a72ac1-ddb9-4c89-a3d5-cc9a558205e2",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        380
+      ],
+      "id": "f21e8031-7213-4920-ab69-ff3e23ec50af",
+      "name": "Qdrant Vector Store1",
+      "credentials": {
+        "qdrantApi": {
+          "id": "V02bcllIG4r1Qs48",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 512,
+        "chunkOverlap": 60,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        520
+      ],
+      "id": "30856838-e9c7-4d55-878a-a2508ac8070e",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "path": "chat-message",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        80
+      ],
+      "id": "a754107b-447b-4412-8ab9-e0bdbdc76368",
+      "name": "Webhook",
+      "webhookId": "db1a76ff-2b79-4a74-97f3-8cd291d23ae1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        20
+      ],
+      "id": "9d7c823a-e16a-4f8f-8c84-ad15a3d99476",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question and Answer Chain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8aeb11d8-5e68-4780-bd26-2e6f5a5d9f0f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0595f074a42b82c9569495d9c45f4a71cf750b1c97c8da7fc914cd74b1920f92"
+  },
+  "id": "IuAPOFYWEiORs9lI",
+  "tags": []
+}
